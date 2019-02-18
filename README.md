@@ -2,6 +2,8 @@
 ## Daniel Pumr
 Tento adresář shromažďuje soubory související se semestrální prací do předmětu Distribuce prostorových dat. Níže následuje krátký informační přehled o jednotlivých souborech.
 
+### [pumr_odevzdani.pdf](pumr_odevzdani.pdf)
+Dokument popisující velmi krátce zracovanou práci, soubory, které práci tvoří a jejich fungování a význam.
 ### [index.html](index.html)
 Stránka na web informující o mapě. Obsahuje krátký popis, odkaz na mapu a legendu.
 ### [mapa.html](mapa.html)
