@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <script type="text/javascript" src="https://api.mapy.cz/loader.js"></script>
+    <script type="text/javascript">Loader.load();</script>
+</head>
+
+<body bgcolor="#ebebeb">
+	<div id="m"></div>  
+		
+    <script>
+        //nastavení úvodního zobrazení
+        var center = SMap.Coords.fromWGS84(14.41790, 50.12655);
+        var m = new SMap(JAK.gel("m"), center, 9);
+        m.addDefaultLayer(SMap.DEF_OPHOTO);
+        m.addDefaultLayer(SMap.DEF_TURIST).enable();
+        m.addDefaultControls();
+
+        //nastavení výběru podkladové mapy
+        var layerSwitch = new SMap.Control.Layer();
+        layerSwitch.addDefaultLayer(SMap.DEF_OPHOTO);
+        layerSwitch.addDefaultLayer(SMap.DEF_TURIST);
+        m.addControl(layerSwitch,{left:"15px", top:"15px"});
+
+        //nastavení minimapy v pravém dolním rohu
+        var Minimap = new SMap.Control.Minimap(150, 150, {color: "#000", opacity: 0.5, diff: -5});
+        m.addControl(Minimap,{right:"15px", bottom:"15px"});
+
+        //přizpůsobení mapy velikosti okna
+        var sync = new SMap.Control.Sync({bottomSpace:5});
+        m.addControl(sync);
+
+        //načtení obrázků pro značky
+        var vesnice1 = "obrazky/vesnice1.png";
+		var vesnice2 = "obrazky/vesnice2.png";
+        var mesto1 = "obrazky/mesto1.png";
+        var mesto2 = "obrazky/mesto2.png";
+		var priroda1 = "obrazky/priroda1.png";
+		var priroda2 = "obrazky/priroda2.png";
+		var zbytek1 = "obrazky/zbytek1.png";
+		var zbytek2 = "obrazky/zbytek2.png";
+
+
+
+        
+		
+		var xmlhttp = new XMLHttpRequest();
+			xmlhttp.onreadystatechange = function() {
+  			if (this.readyState == 4 && this.status == 200) {
+    		var data = JSON.parse(this.responseText);
+		
+				var znacky = [];
+				var souradnice = [];
+
+				for (var name in data) { /* Vyrobit značky */
+					
+					if (data[name]["poloha"] =="") continue;
+
+					
+					var c = SMap.Coords.fromWGS84(data[name]["poloha"]); /* Souřadnice značky, z textového formátu souřadnic */
+
+					if (data[name]["kapacita"]>15)
+						if (data[name]["misto"] =="V"){
+							var options = {
+							url:vesnice2,
+							title:name,
+							};
+							}
+						else if (data[name]["misto"] =="M"){
+							var options = {
+							url:mesto2,
+							title:name,
+							};
+							}	
+						else if (data[name]["misto"] =="P"){
+							var options = {
+							url:priroda2,
+							title:name,
+							};
+							}
+						else {
+							var options = {
+							url:zbytek2,
+							title:name,
+							};
+							}
+					else {
+						if (data[name]["misto"] =="V"){
+							var options = {
+							url:vesnice1,
+							title:name,
+							};
+							}
+						else if (data[name]["misto"] =="M"){
+							var options = {
+							url:mesto1,
+							title:name,
+							};
+							}	
+						else if (data[name]["misto"] =="P"){
+							var options = {
+							url:priroda1,
+							title:name,
+							};
+							}
+						else {
+							var options = {
+							url:zbytek1,
+							title:name,
+							};
+							}
+					}
+
+					
+					var optCard = {
+						anchor: {left:0, top:-40}
+					}
+
+					var card = new SMap.Card(250,optCard);
+					card.getHeader().innerHTML = "<h3>"+name+"</h3>";
+					card.getBody().innerHTML ="<b>Obec: </b>"+data[name]["obec"]+"</br>"
+											+"<b>Kapacita: </b>"+data[name]["kapacita"]+" osob"+"</br>"
+											+"<b>Čas dopravy: </b>"+data[name]["cas"]+" hod"+"</br>"
+											+"<b>Pěšky: </b>"+data[name]["km"]+"</br>"
+											+"<b>Cena: </b>"+data[name]["cena"]+"</br>"
+											+"<b>Vytopitelnost: </b></br>"+data[name]["vytopitelnost1"]+" až "+data[name]["vytopitelnost2"]+"</br>"
+											+"<a href="+data[name]["odkaz"]+"><b>Odkaz</b></a>"+"</br></br>"
+											+"<i>"+data[name]["poznamka"]+"</i>"
+
+					var znacka = new SMap.Marker(c, null, options);
+					znacka.decorate(SMap.Marker.Feature.Card, card);
+					souradnice.push(c);
+					znacky.push(znacka);
+
+
+
+					}
+
+
+				var vrstva = new SMap.Layer.Marker();     /* Vrstva se značkami */
+				m.addLayer(vrstva);                          /* Přidat ji do mapy */
+				vrstva.enable();                         /* A povolit */
+
+				for (var i=0;i<znacky.length;i++) {
+					vrstva.addMarker(znacky[i]);
+				}
+  			}
+		};
+		xmlhttp.open("GET", "data.json", true);
+		xmlhttp.send();	
+
+    </script>
+    
+</body>
+</html>
